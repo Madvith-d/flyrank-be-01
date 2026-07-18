@@ -2,7 +2,15 @@ const express = require('express');
 const app = express();
 
 app.get('/', (req, res) => {
-  res.json({ message: 'Hello from the server side of the loop.' });
+  res.json({
+    name: 'Task API',
+    version: '1.0',
+    endpoints: ['/tasks']
+  });
+});
+
+app.get('/health', (req, res) => {
+  res.json({ status: 'ok' });
 });
 
 const PORT = process.env.PORT || 3000;
