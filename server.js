@@ -1,20 +1,9 @@
-const http = require('http');
+const express = require('express');
+const app = express();
 
-const server = http.createServer((req, res) => {
-  res.setHeader('Content-Type', 'application/json');
-
-  if (req.url === '/' && req.method === 'GET') {
-    res.end(JSON.stringify({
-      message: 'Hello from the server side of the loop.',
-      available_endpoints: ['/', '/time']
-    }));
-  } else if (req.url === '/time' && req.method === 'GET') {
-    res.end(JSON.stringify({ now: new Date().toISOString() }));
-  } else {
-    res.statusCode = 404;
-    res.end(JSON.stringify({ error: 'Not found' }));
-  }
+app.get('/', (req, res) => {
+  res.json({ message: 'Hello from the server side of the loop.' });
 });
 
 const PORT = process.env.PORT || 3000;
-server.listen(PORT, () => console.log(`Listening on http://localhost:${PORT}`));
+app.listen(PORT, () => console.log(`Listening on http://localhost:${PORT}`));
