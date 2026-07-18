@@ -34,7 +34,25 @@ app.get('/health', (req, res) => {
 });
 
 app.get('/tasks', (req, res) => {
-  res.json(tasks);
+  let result = [...tasks];
+
+  if (req.query.done !== undefined) {
+    const done = req.query.done === 'true';
+    result = result.filter(t => t.done === done);
+  }
+
+  if (req.query.search) {
+    const q = req.query.search.toLowerCase();
+    result = result.filter(t => t.title.toLowerCase().includes(q));
+  }
+
+  if (req.query.limit || req.query.offset) {
+    const limit = parseInt(req.query.limit) || result.length;
+    const offset = parseInt(req.query.offset) || 0;
+    result = result.slice(offset, offset + limit);
+  }
+
+  res.json(result);
 });
 
 app.get('/tasks/:id', (req, res) => {
@@ -93,6 +111,23 @@ app.delete('/tasks/:id', (req, res) => {
   }
   tasks.splice(index, 1);
   res.status(204).send();
+});
+
+app.get('/stats', (req, res) => {
+  const total = tasks.length;
+  const done = tasks.filter(t => t.done).length;
+  const open = total - done;
+  res.json({ total, done, open });
+});
+
+app.post('/reset', (req, res) => {
+  tasks = [
+    { id: 1, title: 'Buy groceries', done: false },
+    { id: 2, title: 'Read a book', done: true },
+    { id: 3, title: 'Write code', done: false }
+  ];
+  nextId = 4;
+  res.json({ message: 'Tasks reset to defaults' });
 });
 
 const PORT = process.env.PORT || 3000;
