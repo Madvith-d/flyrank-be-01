@@ -1,6 +1,17 @@
 const express = require('express');
+const swaggerUi = require('swagger-ui-express');
+const openapi = require('./openapi.json');
+
 const app = express();
 app.use(express.json());
+app.use((err, req, res, next) => {
+  if (err instanceof SyntaxError && err.status === 400 && 'body' in err) {
+    return res.status(400).json({ error: 'Invalid JSON in request body' });
+  }
+  next();
+});
+
+app.use('/docs', swaggerUi.serve, swaggerUi.setup(openapi));
 
 let tasks = [
   { id: 1, title: 'Buy groceries', done: false },
